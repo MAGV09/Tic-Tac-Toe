@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import grids from './data.js';
-
+import Scoreboard from './components/Scoreboard.jsx';
 function App() {
   const [value, setValue] = useState('X');
   const [scoreboard, setScore] = useState({
@@ -9,8 +9,8 @@ function App() {
     player2: 0,
     roundCount: 1,
   });
-
-  function check(val) {
+  const [winner, setWinner] = useState('');
+  function checkPattern(grids,val) {
     const case1 =
       grids[0].value === val &&
       grids[1].value === val &&
@@ -44,54 +44,64 @@ function App() {
       grids[5].value === val &&
       grids[8].value === val;
 
-    const arr = [case1, case2, case3, case4, case5, case6, case7, case8];
-    arr.forEach((item) => {
+    const winningPatern = [case1, case2, case3, case4, case5, case6, case7, case8];
+
+    winningPatern.forEach((item) => {
       if (item) {
         if (val == 'X') {
+          setWinner('X');
           setScore({
             ...scoreboard,
             player1: scoreboard.player1 + 1,
             roundCount: scoreboard.roundCount + 1,
           });
         } else {
+          setWinner('O');
           setScore({
             ...scoreboard,
-            player2: scoreboard.player1 + 1,
+            player2: scoreboard.player2 + 1,
             roundCount: scoreboard.roundCount + 1,
           });
         }
+        setTimeout(reset, 2000);
       }
     });
   }
   function draw() {
-    if (grids.every((item) => item.value === 'X' || item.value === 'O')) {
+    if (
+      grids.every(
+        (item) => item.value === 'X' || (item.value === 'O' && winner === '')
+      )
+    ) {
       setScore({
         ...scoreboard,
         roundCount: scoreboard.roundCount + 1,
       });
+      setWinner('Draw');
+      setTimeout(reset, 2000);
     }
   }
+  function reset() {
+    grids.map((grid) => (grid.value = ''));
+    setWinner('');
+  }
+
   function handleClick(grid) {
     if (grid.value !== 'X' && grid.value !== 'O') {
       grid.value = value;
       setValue(value === 'X' ? 'O' : 'X');
     }
-    check('X');
-    check('O');
+    checkPattern(grids,'X');
+    checkPattern(grids,'O');
     draw();
   }
   return (
     <div className="container">
       <div className="scoreboard-container">
-        <div>
-          <div>X</div>
-          <div>({scoreboard.player1})</div>
-        </div>
-        <div>Round {scoreboard.roundCount}</div>
-        <div>
-          <div>O</div>
-          <div>({scoreboard.player2})</div>
-        </div>
+        <Scoreboard title={'X'} content={scoreboard.player1} />
+        <Scoreboard title={'Round ' + scoreboard.roundCount} content={value} />
+        {winner && <h2>{winner}</h2>}
+        <Scoreboard title={'O'} content={scoreboard.player2} />
       </div>
       <div className="grid-container">
         {grids.map((grid) => (
