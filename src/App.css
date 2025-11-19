@@ -1,0 +1,16 @@
+#root {
+
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+
+}
+
+
+.container{
+  display: grid;
+  grid-template-rows: 1fr 3fr;
+  border: 3px solid white;
+  width:50vw;
+  height: 80vh;
+}
